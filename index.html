@@ -1,0 +1,1126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/icon-black.png" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/icon-white.png" media="(prefers-color-scheme: dark)">
+<title>VT CRO Exec Hub</title>
+<!--
+  VT CRO EXEC HUB · internal reference for executives
+
+  HOW TO ADD A SECTION
+  1. Copy a <section class="page"> block below and give it a unique id,
+     a data-title (sidebar label) and a data-group (sidebar heading).
+     The sidebar, search and routing pick it up automatically.
+  2. Put every URL in the LINKS object in the <script> at the bottom, then
+     point buttons at it with <a class="btn" data-link="key">.
+  3. Building blocks:
+       .steps > li.step        numbered, chronological steps
+       .btn / .btn.primary     link buttons (filled from LINKS)
+       button.copy             click-to-copy value: data-copy="text"
+                               or data-copy-po for the team purchase-order note
+       .callout / .callout.warn  highlighted notes
+       .tabs + [data-tab-panel]  segmented tabs inside a page
+       .ref                    label / value reference table
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: fixed sidebar (brand, search, nav) + one page visible at a time; stacks to a top bar on phones */
+:root {
+  --bg: #f4f4f2;
+  --surface: #ffffff;
+  --surface-2: #ecece9;
+  --text: #0a0a0b;
+  --text-2: #45454a;
+  --text-3: #6b6b70;
+  --line: rgb(10 10 11 / 0.1);
+  --line-2: rgb(10 10 11 / 0.2);
+  --accent: #0a0a0b;
+  --accent-text: #ffffff;
+  --warn: #8a5300;
+  --warn-bg: #fbf0d9;
+  --ok: #1d7646;
+  --mark: #ffe58f;
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r-s: 6px;
+  --r-m: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a0a0b; --surface: #141416; --surface-2: #1c1c1f;
+    --text: #f5f5f4; --text-2: #b4b4b6; --text-3: #8a8a8e;
+    --line: rgb(255 255 255 / 0.09); --line-2: rgb(255 255 255 / 0.18);
+    --accent: #f5f5f4; --accent-text: #0a0a0b;
+    --warn: #f2c26b; --warn-bg: #2a2111; --ok: #63d49c; --mark: #5c4b12;
+    color-scheme: dark;
+  }
+  :root:not([data-theme="light"]) .on-light { display: none; }
+  :root:not([data-theme="light"]) .on-dark { display: block; }
+}
+:root[data-theme="dark"] {
+  --bg: #0a0a0b; --surface: #141416; --surface-2: #1c1c1f;
+  --text: #f5f5f4; --text-2: #b4b4b6; --text-3: #8a8a8e;
+  --line: rgb(255 255 255 / 0.09); --line-2: rgb(255 255 255 / 0.18);
+  --accent: #f5f5f4; --accent-text: #0a0a0b;
+  --warn: #f2c26b; --warn-bg: #2a2111; --ok: #63d49c; --mark: #5c4b12;
+  color-scheme: dark;
+}
+.on-dark { display: none; }
+:root[data-theme="dark"] .on-light { display: none; }
+:root[data-theme="dark"] .on-dark { display: block; }
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-sans); font-size: 15px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+
+/* ---------- shell ---------- */
+.shell { display: grid; grid-template-columns: 264px minmax(0, 1fr); min-height: 100%; }
+.sidebar {
+  position: sticky; top: env(safe-area-inset-top, 0px); align-self: start;
+  height: 100vh; overflow-y: auto;
+  border-right: 1px solid var(--line); background: var(--surface);
+  padding: 22px 16px; display: flex; flex-direction: column; gap: 18px;
+}
+.brand { display: flex; flex-direction: column; gap: 6px; padding: 0 8px; text-decoration: none; }
+.brand img { height: 34px; width: auto; max-width: 100%; object-fit: contain; object-position: left; }
+.brand span {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3);
+}
+.search { position: relative; }
+.search input {
+  width: 100%; font: inherit; font-size: 14px; color: var(--text);
+  background: var(--bg); border: 1px solid var(--line-2); border-radius: var(--r-s);
+  padding: 8px 34px 8px 10px;
+}
+.search input::placeholder { color: var(--text-3); }
+.search kbd {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-3);
+  border: 1px solid var(--line-2); border-radius: 4px; padding: 0 5px;
+}
+.results {
+  position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 20;
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-m);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.14); max-height: 60vh; overflow-y: auto; padding: 6px;
+  width: min(420px, calc(100vw - 32px));
+}
+.results button {
+  display: block; width: 100%; text-align: left; font: inherit; color: inherit;
+  background: none; border: 0; border-radius: var(--r-s); padding: 8px 10px; cursor: pointer;
+}
+.results button:hover, .results button.active { background: var(--surface-2); }
+.results .r-where { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.results .r-text { font-size: 13px; color: var(--text-2); display: block; }
+.results .r-empty { padding: 10px; font-size: 13px; color: var(--text-3); }
+
+.nav { display: flex; flex-direction: column; gap: 14px; }
+.nav-group { display: flex; flex-direction: column; gap: 2px; }
+.nav-group h6 {
+  margin: 0 0 4px; padding: 0 8px; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3);
+}
+.nav a {
+  display: block; padding: 7px 8px; border-radius: var(--r-s); text-decoration: none;
+  font-size: 14px; font-weight: 500; color: var(--text-2);
+}
+.nav a:hover { background: var(--surface-2); color: var(--text); }
+.nav a[aria-current="page"] { background: var(--accent); color: var(--accent-text); }
+.sidebar-foot { margin-top: auto; padding: 0 8px; font-size: 12px; color: var(--text-3); }
+
+main { min-width: 0; padding-inline: clamp(16px, 4vw, 56px); padding-block: 40px 96px; }
+.page { max-width: 820px; }
+.page:not(.active) { display: none; }
+
+/* ---------- type ---------- */
+.eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); margin: 0 0 6px; }
+h1 { font-size: 30px; line-height: 1.2; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 8px; text-wrap: balance; }
+h2 { font-size: 20px; line-height: 1.3; font-weight: 700; margin: 40px 0 12px; text-wrap: balance; scroll-margin-top: 24px; }
+h3 { font-size: 16px; line-height: 1.35; font-weight: 600; margin: 24px 0 8px; scroll-margin-top: 24px; }
+h4 { font-size: 15px; font-weight: 600; margin: 0; }
+.lead { font-size: 16px; color: var(--text-2); margin: 0; max-width: 62ch; }
+p { margin: 0 0 12px; max-width: 68ch; }
+.muted { color: var(--text-3); }
+.small { font-size: 13px; }
+
+/* ---------- components ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: inherit; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+  padding: 8px 14px; border-radius: var(--r-s);
+  background: var(--surface); color: var(--text); border: 1px solid var(--line-2);
+  transition: background .12s, border-color .12s;
+}
+.btn:hover { border-color: var(--text); }
+.btn.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.btn.primary:hover { opacity: .88; }
+.btn svg { width: 14px; height: 14px; flex: none; }
+.btn.missing { opacity: .5; pointer-events: none; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+.copy {
+  display: inline-flex; align-items: center; gap: 6px; vertical-align: baseline;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text);
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 5px;
+  padding: 1px 7px; cursor: pointer; max-width: 100%; text-align: left; overflow-wrap: anywhere;
+}
+.copy:hover { border-color: var(--line-2); }
+.copy::after {
+  content: ""; flex: none; width: 12px; height: 12px; opacity: .55;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Crect x='9' y='9' width='12' height='12' rx='2'/%3E%3Cpath d='M5 15V5a2 2 0 0 1 2-2h10'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Crect x='9' y='9' width='12' height='12' rx='2'/%3E%3Cpath d='M5 15V5a2 2 0 0 1 2-2h10'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.copy.copied { color: var(--ok); border-color: var(--ok); }
+.copy.copied::after { opacity: 1; }
+
+.callout {
+  border: 1px solid var(--line-2); background: var(--surface); border-radius: var(--r-m);
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 4px;
+}
+.callout h4 { font-size: 15px; }
+.callout p { margin: 0; color: var(--text-2); }
+.callout.warn { background: var(--warn-bg); border-color: transparent; }
+.callout.warn h4, .callout.warn .tag { color: var(--warn); }
+.callout.strong { border: 2px solid var(--text); }
+
+.tag {
+  display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; line-height: 1.5;
+}
+.tag.ok { color: var(--ok); }
+.tag.warn { color: var(--warn); }
+.tag.neutral { color: var(--text-3); }
+
+/* steps */
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+.step {
+  counter-increment: step; position: relative;
+  display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 16px;
+  padding-bottom: 22px;
+}
+.step::before {
+  content: ""; position: absolute; left: 15px; top: 34px; bottom: 2px; width: 2px; background: var(--line);
+}
+.step:last-child::before { display: none; }
+.step-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+  background: var(--surface); border: 1.5px solid var(--text); color: var(--text);
+  cursor: pointer; padding: 0;
+}
+.step-num::before { content: counter(step); }
+.step.done .step-num { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.step.done .step-num::before { content: "✓"; font-family: var(--font-sans); }
+.step.done .step-body > h4 { color: var(--text-3); text-decoration: line-through; }
+.step-body { padding-top: 4px; min-width: 0; }
+.step-body > h4 { margin-bottom: 4px; }
+.step-body p { margin: 0 0 6px; color: var(--text-2); }
+.step-body ul { margin: 4px 0 0; padding-left: 18px; color: var(--text-2); }
+.step-body li { margin: 3px 0; }
+.step.final .step-num { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.steps-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
+.linkish { background: none; border: 0; padding: 0; font: inherit; font-size: 13px; color: var(--text-3); text-decoration: underline; cursor: pointer; }
+
+.example {
+  margin-top: 8px; padding: 10px 12px; border-radius: var(--r-s); background: var(--surface-2);
+  font-size: 13px; color: var(--text-2); overflow-x: auto;
+}
+.example code { white-space: nowrap; }
+.example b { color: var(--text); background: var(--mark); padding: 0 2px; border-radius: 2px; font-weight: 600; }
+
+/* tabs */
+.tabs {
+  display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px;
+  background: var(--surface-2); border-radius: var(--r-m); margin-bottom: 20px;
+}
+.tabs button {
+  font: inherit; font-size: 14px; font-weight: 600; color: var(--text-2);
+  background: none; border: 0; border-radius: var(--r-s); padding: 7px 16px; cursor: pointer;
+}
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgb(0 0 0 / 0.12); }
+[data-tab-panel]:not(.shown) { display: none; }
+.panel-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; margin-bottom: 16px; }
+.panel-head h3 { margin: 0; }
+
+/* payment priority */
+.priority { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; list-style: none; padding: 0; margin: 0; }
+.priority li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.priority .rank { font-family: var(--font-mono); font-size: 12px; color: var(--text-3); }
+.priority h4 { font-size: 15px; }
+.priority p { margin: 0; font-size: 13px; color: var(--text-2); }
+
+/* team picker */
+.team-picker {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+  padding: 14px 16px; border: 1px dashed var(--line-2); border-radius: var(--r-m); margin-bottom: 20px;
+}
+.team-picker label { font-weight: 600; font-size: 14px; }
+.team-picker select, .team-picker input {
+  font: inherit; font-size: 14px; color: var(--text); background: var(--surface);
+  border: 1px solid var(--line-2); border-radius: var(--r-s); padding: 6px 10px;
+}
+.team-picker .small { flex-basis: 100%; margin: 0; }
+
+/* reference table */
+.ref-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-m); background: var(--surface); }
+.ref { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ref th, .ref td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ref tr:last-child th, .ref tr:last-child td { border-bottom: 0; }
+.ref th { font-weight: 500; color: var(--text-2); width: 42%; }
+.ref td .muted { font-size: 13px; display: block; margin-top: 2px; }
+.ref thead th { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); background: var(--surface-2); }
+
+/* constitution */
+.toc { columns: 2 240px; column-gap: 24px; padding: 16px 18px; margin: 20px 0 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); list-style: none; }
+.toc li { break-inside: avoid; padding: 3px 0; font-size: 14px; }
+.toc a { text-decoration: none; color: var(--text-2); }
+.toc a:hover { color: var(--text); text-decoration: underline; }
+.toc .num { font-family: var(--font-mono); font-size: 12px; color: var(--text-3); display: inline-block; min-width: 3.4em; }
+.doc h2 { padding-top: 20px; border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; }
+.doc h2 .num { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text-3); flex: none; min-width: 3.4em; }
+.doc ul, .doc ol { padding-left: 22px; max-width: 68ch; margin: 0 0 12px; }
+.doc li { margin: 4px 0; }
+.doc .nested { border-left: 2px solid var(--line-2); padding-left: 18px; margin: 16px 0; }
+.doc .nested h3 { margin-top: 18px; }
+.doc .nested h4 { margin: 14px 0 4px; }
+.mission { font-size: 17px; font-weight: 600; max-width: 56ch; }
+.back-top { font-size: 13px; color: var(--text-3); }
+
+.org { overflow-x: auto; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); margin: 8px 0 12px; }
+.org ul { list-style: none; margin: 0; padding-left: 22px; }
+.org > ul { padding-left: 0; }
+.org li { position: relative; padding: 4px 0 4px 18px; margin: 0; white-space: nowrap; }
+.org li::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; border-left: 1.5px solid var(--line-2); }
+.org li:last-child::before { bottom: auto; height: 17px; }
+.org li::after { content: ""; position: absolute; left: 0; top: 17px; width: 12px; border-top: 1.5px solid var(--line-2); }
+.org > ul > li { padding-left: 0; }
+.org > ul > li::before, .org > ul > li::after { display: none; }
+.node { display: inline-block; font-size: 13px; font-weight: 500; padding: 3px 10px; border: 1px solid var(--line-2); border-radius: var(--r-s); background: var(--bg); }
+.node.exec { font-weight: 600; border-color: var(--text); }
+.node.exec::before { content: "★ "; color: var(--warn); }
+.node.more { border-style: dashed; color: var(--text-3); }
+
+.signers { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0 20px; margin: 0 0 12px; padding: 0; list-style: none; }
+.signers li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; display: flex; flex-direction: column; }
+.signers span { color: var(--text-3); font-size: 13px; }
+details.sig { margin-top: 8px; }
+details.sig summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+details.sig img { margin-top: 12px; border-radius: var(--r-m); border: 1px solid var(--line); background: #fff; }
+
+.flash { animation: flash 1.6s ease-out; }
+@keyframes flash { 0%, 30% { background: var(--mark); } 100% { background: transparent; } }
+
+hr.sep { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
+
+/* ---------- phone ---------- */
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .sidebar {
+    position: static; height: auto; overflow: visible; border-right: 0; border-bottom: 1px solid var(--line);
+    padding: 16px; gap: 12px;
+  }
+  .brand { padding: 0; flex-direction: row; align-items: center; justify-content: space-between; }
+  .brand img { height: 28px; }
+  .nav { flex-direction: row; overflow-x: auto; gap: 4px; margin: 0 -16px; padding: 0 16px; scrollbar-width: none; }
+  .nav-group { flex-direction: row; gap: 4px; }
+  .nav-group h6 { display: none; }
+  .nav a { white-space: nowrap; border: 1px solid var(--line); }
+  .sidebar-foot { display: none; }
+  .search kbd { display: none; }
+  main { padding-block: 24px 72px; }
+  h1 { font-size: 25px; }
+  .priority { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" href="#home" aria-label="VT CRO Exec Hub home">
+      <img class="on-light" src="assets/logo-black.webp" alt="VT CRO">
+      <img class="on-dark" src="assets/logo-white.webp" alt="VT CRO">
+      <span>Exec Hub</span>
+    </a>
+    <div class="search">
+      <input id="search" type="search" placeholder="Search the hub" autocomplete="off" aria-label="Search the hub">
+      <kbd>/</kbd>
+      <div class="results" id="results" hidden></div>
+    </div>
+    <nav class="nav" id="nav" aria-label="Sections"></nav>
+    <div class="sidebar-foot">Internal · executives only</div>
+  </aside>
+
+  <main id="main">
+
+<!-- ================================================================== -->
+<!-- HOME                                                                 -->
+<!-- ================================================================== -->
+<section class="page" id="home" data-title="Home" data-group="General">
+  <p class="eyebrow">VT CRO · Executive board</p>
+  <h1>Exec Hub</h1>
+
+  <h2 id="home-reference">Quick reference</h2>
+  <p class="muted small">Click any value to copy it.</p>
+  <div class="ref-wrap">
+    <table class="ref">
+      <tbody>
+        <tr><th>ECE fund number</th><td><button class="copy" data-copy="117020">117020</button><span class="muted">Kathy Atkins</span></td></tr>
+        <tr><th>ECE PI</th><td><button class="copy" data-copy="Tyler Milburn">Tyler Milburn</button></td></tr>
+        <tr><th>ECE ship-to</th><td><button class="copy" data-copy="Whittemore 453">Whittemore 453</button><span class="muted">Ground shipping</span></td></tr>
+        <tr><th>ME purchasing contact</th><td><button class="copy" data-copy="amangs1@vt.edu">amangs1@vt.edu</button></td></tr>
+        <tr><th>ISE fund number</th><td><button class="copy" data-copy="FS0856">FS0856</button><span class="muted">LeClaire fund</span></td></tr>
+        <tr><th>ISE faculty approver</th><td><button class="copy" data-copy="David G Price">David G Price</button></td></tr>
+        <tr><th>Purchase order note</th><td><button class="copy" data-copy-po></button><span class="muted">Set your team on the <a href="#purchasing">Purchasing</a> page</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- PURCHASING                                                           -->
+<!-- ================================================================== -->
+<section class="page" id="purchasing" data-title="Purchasing" data-group="Operations">
+  <p class="eyebrow">Operations</p>
+  <h1>Ordering parts</h1>
+  <p class="lead">Pick a payment method, follow the steps for your department, then log the purchase.</p>
+
+  <div class="callout strong" style="margin-top:24px" id="purchase-log">
+    <h4>Log every purchase, every time</h4>
+    <p>Fill out the purchase log form for every purchase, no matter where you bought it or how you paid.</p>
+    <div class="actions"><a class="btn primary" data-link="purchaseLog">Open purchase log form</a></div>
+  </div>
+
+  <h2 id="payment-priority">1. Choose how to pay</h2>
+  <ol class="priority">
+    <li><span class="rank">1st choice</span><h4>Department purchase</h4><p>Order through ECE, ME or ISE. Preferred over the CRO card.</p><span><span class="tag ok">Preferred</span></span></li>
+    <li><span class="rank">2nd choice</span><h4>CRO debit card</h4><p>Use when a department order won't work.</p></li>
+    <li><span class="rank">3rd choice</span><h4>Personal card</h4><p>Reimbursement is slow and a lot of work.</p><span><span class="tag warn">Last resort</span></span></li>
+  </ol>
+
+  <h2 id="department-steps">2. Order through a department</h2>
+
+  <div class="team-picker">
+    <label for="team">Your team</label>
+    <select id="team"></select>
+    <input id="team-other" type="text" placeholder="Team name" aria-label="Team name" hidden>
+    <p class="small muted">Fills in the purchase order note below: <button class="copy" data-copy-po></button></p>
+  </div>
+
+  <div class="tabs" role="tablist" data-tabs="dept">
+    <button role="tab" data-tab="ece">ECE</button>
+    <button role="tab" data-tab="me">ME</button>
+    <button role="tab" data-tab="ise">ISE</button>
+  </div>
+
+  <!-- ECE -->
+  <div data-tab-panel="ece" id="ece">
+    <div class="panel-head"><h3 id="ece-steps">Purchase request through ECE</h3><span class="tag neutral">9 steps</span></div>
+    <ol class="steps">
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Connect to eduroam or the VT VPN</h4>
+        <p>The ECE portal only loads on the campus network.</p>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Open the portal and start a request</h4>
+        <p>Click <b>"Submit New Purchase Request"</b>.</p>
+        <div class="actions"><a class="btn primary" data-link="ecePortal">Open ECE purchasing portal</a></div>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Enter your details and the fund</h4>
+        <ul>
+          <li>Your email and name</li>
+          <li>Fund number: <button class="copy" data-copy="117020">117020</button> (Kathy Atkins)</li>
+          <li>PI: <button class="copy" data-copy="Tyler Milburn">Tyler Milburn</button></li>
+        </ul>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Add vendor information, then click Submit</h4>
+        <p>Enter the vendor name and vendor website. Put <button class="copy" data-copy="N/A">N/A</button> in every other vendor field.</p>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Enter the product number, then click Submit</h4>
+        <p>Most part websites list the product number on the component page. On Amazon, it's the code after <code>/dp/</code> in the URL.</p>
+        <div class="example"><code>amazon.com/ZHONGXIN-MADE-Crow-Plush-Toy/dp/<b>B0CF1SLH14</b>/ref…</code><br>Product number: <code>B0CF1SLH14</code></div>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Set shipping</h4>
+        <ul>
+          <li>Select <b>ground shipping</b></li>
+          <li>Deliver to <button class="copy" data-copy="Whittemore 453">Whittemore 453</button></li>
+        </ul>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Add the purchase order note</h4>
+        <p>In the notes and additional fields section, write: <button class="copy" data-copy-po></button></p>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Submit the purchase order</h4>
+      </div></li>
+      <li class="step final"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Log the purchase</h4>
+        <p>Fill out the purchase log form.</p>
+        <div class="actions"><a class="btn" data-link="purchaseLog">Open purchase log form</a></div>
+      </div></li>
+    </ol>
+  </div>
+
+  <!-- ME -->
+  <div data-tab-panel="me" id="me">
+    <div class="panel-head"><h3 id="me-steps">Purchase request through ME</h3><span class="tag neutral">3 steps</span></div>
+    <ol class="steps">
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Make a parts sheet</h4>
+        <p>Create an Excel file or sheet with these four columns:</p>
+        <div class="ref-wrap" style="margin:8px 0">
+          <table class="ref"><thead><tr><th>Part</th><th>Link to Part</th><th>Part Price</th><th>Quantity</th></tr></thead></table>
+        </div>
+        <div class="actions"><button class="btn" data-copy="Part&#9;Link to Part&#9;Part Price&#9;Quantity" data-copy-label="Copy column headers">Copy column headers</button></div>
+        <p class="small muted" style="margin-top:6px">Paste into the first cell of a spreadsheet and the headers fill four columns.</p>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Email the sheet to the ME contact</h4>
+        <ul>
+          <li>To: <button class="copy" data-copy="amangs1@vt.edu">amangs1@vt.edu</button></li>
+          <li>Mention: <button class="copy" data-copy-po></button></li>
+          <li>Attach the parts sheet</li>
+        </ul>
+        <div class="actions"><a class="btn primary" id="me-mailto" href="mailto:amangs1@vt.edu">Start email draft</a></div>
+        <p class="small muted" style="margin-top:6px">If the draft doesn't open, copy the address above.</p>
+      </div></li>
+      <li class="step final"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Log the purchase</h4>
+        <p>Fill out the purchase log form.</p>
+        <div class="actions"><a class="btn" data-link="purchaseLog">Open purchase log form</a></div>
+      </div></li>
+    </ol>
+  </div>
+
+  <!-- ISE -->
+  <div data-tab-panel="ise" id="ise">
+    <div class="panel-head"><h3 id="ise-steps">Purchase request through ISE</h3><span class="tag neutral">5 steps</span></div>
+    <ol class="steps">
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Open the ISE purchase form</h4>
+        <p>Fill out the section under <b>Vendor Request</b>.</p>
+        <div class="actions"><a class="btn primary" data-link="iseForm">Open ISE purchase form</a></div>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Enter the fund</h4>
+        <ul>
+          <li>Fund number: <button class="copy" data-copy="FS0856">FS0856</button></li>
+          <li>Mention <button class="copy" data-copy="LeClaire fund">LeClaire fund</button> and <button class="copy" data-copy="VT CRO Purchase Order">VT CRO Purchase Order</button></li>
+        </ul>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Set the faculty approver</h4>
+        <p><button class="copy" data-copy="David G Price">David G Price</button></p>
+      </div></li>
+      <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Fill out all other details and submit</h4>
+      </div></li>
+      <li class="step final"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+        <h4>Log the purchase</h4>
+        <p>Fill out the purchase log form.</p>
+        <div class="actions"><a class="btn" data-link="purchaseLog">Open purchase log form</a></div>
+      </div></li>
+    </ol>
+  </div>
+
+  <p class="small muted">Tip: click a step number to check it off. <button class="linkish" id="reset-steps">Reset checkmarks</button></p>
+</section>
+
+<!-- ================================================================== -->
+<!-- LAB ACCESS                                                           -->
+<!-- ================================================================== -->
+<section class="page" id="lab-access" data-title="Lab access" data-group="Operations">
+  <p class="eyebrow">Operations</p>
+  <h1>Lab access</h1>
+  <p class="lead">Every member who needs lab access fills out the lab access form. Lab access is step 7 of onboarding and is revoked during offboarding.</p>
+
+  <h2 id="lab-steps">Getting someone lab access</h2>
+  <ol class="steps">
+    <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+      <h4>Have them fill out the lab access form</h4>
+      <div class="actions"><a class="btn primary" data-link="labAccessForm">Open lab access form</a></div>
+    </div></li>
+    <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+      <h4>Check that their response came in</h4>
+      <p>The responses spreadsheet shows everyone who has filled out the form.</p>
+      <div class="actions"><a class="btn" data-link="labAccessSheet">Open lab access responses</a></div>
+    </div></li>
+  </ol>
+
+  <p class="small muted">Full onboarding and offboarding checklists are in <a href="#art-11">Article XI of the constitution</a>.</p>
+</section>
+
+<!-- ================================================================== -->
+<!-- CONSTITUTION                                                         -->
+<!-- ================================================================== -->
+<section class="page" id="constitution" data-title="Constitution" data-group="Governance">
+  <p class="eyebrow">Governance · Ratified 2026</p>
+  <h1 id="constitution-top">Constitution of the Virginia Tech Competitive Robotics Organization</h1>
+  <p class="lead">Full text of the signed 2026 constitution.</p>
+
+  <ol class="toc">
+    <li><a href="#art-1"><span class="num">I</span>Name</a></li>
+    <li><a href="#art-2"><span class="num">II</span>Mission, Purpose, &amp; Core Values</a></li>
+    <li><a href="#art-3"><span class="num">III</span>Organizational Structure</a></li>
+    <li><a href="#art-4"><span class="num">IV</span>Executive Positions and Responsibilities</a></li>
+    <li><a href="#art-5"><span class="num">V</span>Subteam RSOs</a></li>
+    <li><a href="#art-6"><span class="num">VI</span>Essential Events</a></li>
+    <li><a href="#art-7"><span class="num">VII</span>Design Teams and Support Teams</a></li>
+    <li><a href="#art-8"><span class="num">VIII</span>Presidential Checks</a></li>
+    <li><a href="#art-9"><span class="num">IX</span>Constitutional Amendments</a></li>
+    <li><a href="#art-10"><span class="num">X</span>Succession</a></li>
+    <li><a href="#art-11"><span class="num">XI</span>Member Onboarding/Offboarding</a></li>
+    <li><a href="#art-12"><span class="num">XII</span>Team Transfers</a></li>
+    <li><a href="#art-13"><span class="num">XIII</span>Mentors</a></li>
+    <li><a href="#art-14"><span class="num">XIV</span>Finance and Budgeting</a></li>
+    <li><a href="#art-15"><span class="num">XV</span>General Recruitment</a></li>
+    <li><a href="#art-16"><span class="num">XVI</span>Sponsors</a></li>
+    <li><a href="#art-17"><span class="num">XVII</span>Advisory Board</a></li>
+    <li><a href="#art-18"><span class="num">XVIII</span>Ratification</a></li>
+    <li><a href="#signatories"><span class="num">—</span>Signatories</a></li>
+  </ol>
+
+  <div class="doc">
+    <h2 id="art-1"><span class="num">Art. I</span>Name</h2>
+    <p>The organization defined in this constitution shall be known as the “Competitive Robotics Organization at Virginia Tech” or “VT CRO”, hereafter referred to in this document as “<i>VT CRO</i>”, “<i>this organization</i>”, and “<i>the organization</i>”.</p>
+
+    <h2 id="art-2"><span class="num">Art. II</span>Mission, Purpose, &amp; Core Values</h2>
+    <h3 id="art-2-mission">Mission</h3>
+    <p class="mission">VT CRO’s stated mission is to <i>Improve the presence of robotics at Virginia Tech and surrounding communities.</i></p>
+    <h3 id="art-2-purpose">Purpose</h3>
+    <p>The purpose of VT CRO is as follows:</p>
+    <ul>
+      <li>Provide operational support to a portfolio of design teams, primarily in robotics, to compete and win in competitions throughout the world.</li>
+      <li>Improve the presence of robotics at Virginia Tech and surrounding communities.</li>
+      <li>Represent Virginia Tech’s students in the arena of national and international robotics.</li>
+      <li>Develop students to become the best engineers and leaders possible.</li>
+    </ul>
+    <h3 id="art-2-values">Core Values</h3>
+    <p>VT CRO’s 3 Core Values are defined as follows:</p>
+    <ul>
+      <li><b>Reliability:</b> We are committed to building things that are designed to work over a long period of time, from the robots we build, to the structure of the organization we represent.</li>
+      <li><b>Simplicity:</b> Through simplicity and reduction of complexity, things become easier to understand, more reliable, and easier to bring to reality.</li>
+      <li><b>Modularity:</b> Modularity brings the possibility of layering sophisticated systems in an elegant and simple way. It also allows for parallel development of subsystems at scale.</li>
+    </ul>
+
+    <h2 id="art-3"><span class="num">Art. III</span>Organizational Structure</h2>
+    <p>The Organizational Structure of VT CRO shall be defined as follows:</p>
+    <h3 id="art-3-org-chart">Org Chart</h3>
+    <p>To accommodate a modular structure of VT CRO, a variable number of design teams and support teams are supported. VT CRO’s organizational structure is as follows:</p>
+    <div class="org" aria-label="Org chart">
+      <ul>
+        <li><span class="node exec">President</span>
+          <ul>
+            <li><span class="node exec">VP of Operations</span>
+              <ul>
+                <li><span class="node exec">Treasurer</span></li>
+                <li><span class="node">Operations Team</span></li>
+              </ul>
+            </li>
+            <li><span class="node exec">VP of Engineering</span>
+              <ul>
+                <li><span class="node exec">Chief Engineer of [Design Team]</span>
+                  <ul><li><span class="node">Design Team</span></li><li><span class="node">Embedded Operations Person</span></li></ul>
+                </li>
+                <li><span class="node exec">Chief Engineer of [Design Team]</span>
+                  <ul><li><span class="node">Design Team</span></li><li><span class="node">Embedded Operations Person</span></li></ul>
+                </li>
+                <li><span class="node more">…</span></li>
+              </ul>
+            </li>
+            <li><span class="node exec">VP of [Support Team]</span><ul><li><span class="node">Support Team</span></li></ul></li>
+            <li><span class="node exec">VP of [Support Team]</span><ul><li><span class="node">Support Team</span></li></ul></li>
+            <li><span class="node more">…</span></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <p class="small muted">★ Executive</p>
+    <h3 id="art-3-progression">Member Progression</h3>
+    <p>To ensure the continuous transfer of technical expertise and institutional knowledge across successive design cycles, active members should typically advance through the organization according to the following progression:</p>
+    <ul>
+      <li>Team Member</li>
+      <li>Sub team Lead</li>
+      <li>Chief Engineer</li>
+      <li>Executive Board Member or Senior Mentor</li>
+    </ul>
+    <p>The progression outlined in this section serves as a framework for leadership development. Any deviation from this path - including the expedited promotion or alternative placement of a member - shall be considered an extenuating circumstance. Such exceptions require the formal review and joint approval of both the Vice President of Engineering and the President.</p>
+    <p>This tiered structure is established to facilitate a "trickle-down" mentorship model. By maintaining this sequence, the organization ensures that specialized knowledge accumulated during previous engineering milestones is effectively preserved and distilled for the benefit of incoming cohorts.</p>
+    <h3 id="art-3-executives">Executives</h3>
+    <p>The Executive group of VT CRO is the top staff entrusted to execute the mission and objectives of VT CRO. The members included in this group are:</p>
+    <ul>
+      <li>President</li>
+      <li>Treasurer (reports directly to VP of Operations)</li>
+      <li>All VPs (reporting directly to the President)</li>
+      <li>All Chief Engineers (reporting directly to the VP of Engineering)</li>
+    </ul>
+    <h3 id="art-3-design-teams">Design Teams</h3>
+    <p>A Design Team is a team that is tasked with building an engineering project and will be placed in the organization directly under the VP of Engineering and President. Any number of design teams may be placed under the VP of Engineering.</p>
+    <h3 id="art-3-support-teams">Support Teams</h3>
+    <p>A Support Team is a team that provides a different value to the organization, such as offering workshops and running outreach events. These teams will report directly to the President. Any number of these support teams may be placed under the President.</p>
+    <h3 id="art-3-operations">Operations Team</h3>
+    <p>The operations team shall handle finances, fundraising, the organization of travel to competition, general upkeep of the organization, planning and executing social events, advertising, and the bulk of stakeholder communication.</p>
+
+    <h2 id="art-4"><span class="num">Art. IV</span>Executive Positions and Responsibilities</h2>
+    <h3 id="art-4-president">President</h3>
+    <p>The President serves as the leader of VT CRO, setting the direction and objectives of the organization, and ensuring proper execution. Due to the powers entrusted to the President, the success of the organization is ultimately their responsibility. They must be an undergraduate at the beginning of each academic year they serve and must be enrolled at Virginia Tech during each entire year.</p>
+    <p>The President of VT CRO is authorized by this constitution the following powers to best effectively serve the organization:</p>
+    <ul>
+      <li>Appoint non-executive members to the organization.</li>
+      <li>Dismiss any non-executive member within the organization.</li>
+      <li>Appoint executives to the organization.</li>
+      <li>Dismiss executives from the organization, only if seconded by either the VP of Operations (VPO) or VP of Engineering (VPE).</li>
+      <li>Serve as the principal representative of VT CRO.</li>
+      <li>Responsible for Chief Engineer transition as outlined in Article X.</li>
+      <li>Holds the ultimate decision-making authority within VT CRO*.</li>
+    </ul>
+    <p class="small muted">*Limits to this power are outlined in <a href="#art-8">Article VIII</a>.</p>
+    <h3 id="art-4-vpo">VP of Operations (VPO)</h3>
+    <p>The Vice President of Operations (VPO) shall oversee all logistics and support the execution of VT CRO’s mission and objectives. They must be an undergraduate at the beginning of each academic year they serve and must be enrolled at Virginia Tech during each entire year.</p>
+    <p>The VP of Operations (VPO) of VT CRO is authorized by this constitution for the following powers to best effectively serve the organization:</p>
+    <ul>
+      <li>Full oversight of the Operations team, including the appointment and dismissal of members.</li>
+      <li>Maintains organizational branding standards and ensures consistency across all materials and communications.</li>
+      <li>Control over the VT CRO bank account.</li>
+    </ul>
+    <h3 id="art-4-vpe">VP of Engineering (VPE)</h3>
+    <p>The Vice President of Engineering (VPE) is responsible for enforcing engineering standards across all VT CRO design teams, ensuring adherence to the organization’s core principles of reliability, simplicity, and modularity. The VPE also serves as the primary liaison between the President and VT CRO’s Chief Engineers. They must be an undergraduate at the beginning of each academic year they serve and must be enrolled at Virginia Tech during each entire year.</p>
+    <p>The VP of Engineering (VPE) of VT CRO is authorized by this constitution for the following powers to best effectively serve the organization:</p>
+    <ul>
+      <li>Serve as the primary liaison between the President and Chief Engineers.</li>
+      <li>Upholds engineering standards across all VT CRO design teams.</li>
+      <li>Ensures adherence to VT CRO’s core design principles of reliability, simplicity, and modularity.</li>
+      <li>Provides technical oversight and support to teams to maintain consistency and quality.</li>
+      <li>Responsible for Chief Engineer transition as outlined in Article X.</li>
+    </ul>
+    <h3 id="art-4-treasurer">Treasurer</h3>
+    <p>The Treasurer is responsible for the financial position of the organization. They will work with all executives to provide updated information. They must be an undergraduate at the beginning of each academic year they serve and must be enrolled at Virginia Tech during each entire year.</p>
+    <p>The Treasurer of VT CRO is authorized by this constitution the following powers to best effectively serve the organization:</p>
+    <ul>
+      <li>Access to bank account and financial accounts of the club.</li>
+    </ul>
+    <h3 id="art-4-chief-engineers">Chief Engineers</h3>
+    <p>Each Chief Engineer serves as the leader of a design team within VT CRO. Chief Engineers operate on an academic-year design cycle. While they maintain final authority over team operations, they collaborate with the VP of Engineering and the President on high-level strategic decisions, such as personnel appointments, dismissals, and competition selection.</p>
+    <p>The Chief Engineers of VT CRO are authorized by this constitution the following powers to best effectively serve the organization:</p>
+    <ul>
+      <li>Full oversight over their own design team, including competition selection, appointing members, managing scheduling, and dismissing members.</li>
+      <li>Oversight to spend their authorized budget on necessary materials and travel expenses.</li>
+      <li>Ensuring their team is on track to meet the team’s goals and objectives.</li>
+      <li>Chief Engineers are contracted on a single academic-year design cycle.</li>
+    </ul>
+    <h3 id="art-4-support-vps">Support Team VPs</h3>
+    <p>Each Support Team VP serves as the leader of a support team within VT CRO. The Support Team VPs of VT CRO are authorized by this constitution the following powers to best effectively serve the organization:</p>
+    <ul>
+      <li>Full oversight over their support team, including appointing, managing, and dismissing members.</li>
+      <li>Oversight to spend their authorized budget on necessary materials and travel expenses.</li>
+    </ul>
+
+    <h2 id="art-5"><span class="num">Art. V</span>Subteam RSOs</h2>
+    <p>Each design team or support team may exist as its own RSO to best reflect its own separate material, space, and travel needs. These RSOs must always have the same President, VP of Operations, and VP of Engineering as VT CRO, with the President as the final decision maker. Any changes to the titles or roles within this RSO must be given in written permission from the President of VT CRO. The constitution of this RSO must adopt the constitution outlined in this section.</p>
+    <h3 id="art-5-rso-constitution">RSO Constitution</h3>
+    <div class="nested">
+      <h4>Article I: Name</h4>
+      <p>This organization shall be known as Virginia Tech Competitive Robotics Organization.</p>
+      <h4>Article II: VT CRO</h4>
+      <p>This organization shall exist under the structure of the Virginia Tech Competitive Robotics Organization (“VT CRO”). This organization will honor VT CRO’s constitution, including all updates to it. This constitution must be ratified by a 2/3 majority of the current VT CRO executive board.</p>
+      <h4>Article III: Positions</h4>
+      <p>This organization shall have 5 leadership positions, as listed below.</p>
+      <p><b>President</b><br>The President shall be whoever currently holds the position of President of VT CRO. They are the final decision maker of this organization and are solely able to make changes to this constitution.</p>
+      <p><b>Chief Engineer</b><br>Shall be appointed by the President on formation of a new design team. This position may be renamed to the most relevant name, such as Chief Engineer of AutoNav. They are responsible for the leadership of this organization.</p>
+      <p><b>VP of Operations</b><br>The VP of Operations shall be whoever currently holds the position of VP of Operations of VT CRO.</p>
+      <p><b>VP of Engineering</b><br>The VP of Engineering shall be whoever currently holds the position of VP of Engineering of VT CRO.</p>
+      <p><b>VP of Support Team</b><br>The VP of Support Team shall be whoever currently holds the position of VP of that support team of VT CRO.</p>
+      <p><b>Treasurer</b><br>The Treasurer is appointed by the VP of Operations and is usually a member of the Operations team of VT CRO. They will act as Treasurer of this organization and will be given responsibilities from the VP of Operations and President. The President may decide to have the Treasurer report to the VPO or President.</p>
+    </div>
+
+    <h2 id="art-6"><span class="num">Art. VI</span>Essential Events</h2>
+    <p>There will be various important events throughout the academic year; these events shall create a framework and pace for the organization. Smaller teams may be established to carry out the planning and execution of each event, and exactly one person shall be appointed to be overall responsible for the event’s success, usually the VP of Operations. The events suggested for implementation are as follows:</p>
+    <h3 id="art-6-fall">Fall Events</h3>
+    <p><b>O-Show</b><br>VT CRO’s presence as O-Show will be its first event of the year. Similarly to GobblerFest, its principal purpose is to recruit talented students.</p>
+    <p><b>GobblerFest</b><br>VT CRO’s presence as GobblerFest will involve flyers to apply to the organization and a robot to demonstrate during the event.</p>
+    <p><b>Picture Day</b><br>Headshots for all VT CRO members should be taken over the course of one day, with a retake day one week later. Headshots will be taken after the Fall recruitment cycle is over.</p>
+    <h3 id="art-6-spring">Spring Events</h3>
+    <p><b>VEX Competition</b><br>VT CRO should hold a VEX competition each year, with back-to-back VEX U (college) and VRC (High School) competitions.</p>
+    <p><b>CRO Expo</b><br>Near the end of the school year, VT CRO will host CRO Expo, inviting all members, stakeholders, and any other interested party. All projects made over the course of that academic year should be demonstrated. All VT CRO design teams must exhibit. Other successful design teams from Virginia Tech may be invited to participate.</p>
+    <p><b>Merch and Cords</b><br>Based on the financial position of the organization, to be determined by the VPO and Treasurer, merch should be purchased for the entire organization featuring VT CRO branding. Graduation cords should be bought for graduating seniors part of VT CRO.</p>
+
+    <h2 id="art-7"><span class="num">Art. VII</span>Design Teams and Support Teams</h2>
+    <p>Design Teams and Support Teams can be added or removed by the President, but any such decision must receive approval from the Vice President of Engineering (VPE) and the Vice President of Operations (VPO) to take effect. All teams, executives, and members must be listed publicly.</p>
+
+    <h2 id="art-8"><span class="num">Art. VIII</span>Presidential Checks</h2>
+    <p>To ensure a balanced distribution of authority within VT CRO, the following measures are established to check the power of the President and maintain the integrity of the organization:</p>
+    <h3 id="art-8-removal">Presidential Removal Procedure</h3>
+    <ul>
+      <li>Either the VP of Operations (VPO) or the VP of Engineering (VPE) can propose the removal of the President at any time if they believe it is in the best interest of the organization.</li>
+      <li>Upon such a proposal, all executives will be notified, and a meeting will be set up for the removal proposal to be discussed and voted upon.</li>
+      <li>A vote will be held among the executives. A simple majority vote of the executives in favor of removal is required to remove the President from their position.</li>
+      <li>If the President is removed, either the VP of Operations or the VP of Engineering will immediately assume the role of President and may appoint a new VP to succeed them.</li>
+    </ul>
+    <h3 id="art-8-limits">Limitations on Presidential Authority</h3>
+    <p>The President’s authority to dismiss the VP of Operations (VPO) or VP of Engineering (VPE) must be seconded by either the VPO or VPE to be valid.</p>
+    <h3 id="art-8-oversight">Executive Oversight</h3>
+    <p>The VPO, VPE, and rest of the executive board are entrusted with the responsibility of ensuring that the President’s decisions align with the mission and objectives of VT CRO. If an executive member believes a decision was made harmful to the organization, they may call an executive meeting for the issue to be discussed. There, the VPO or VPE and the President will present their reasoning regarding the decision, and the executive board will vote to overturn the President’s decision (simple majority required). At these meetings, 2/3 of the executive board must vote, with an option to vote virtually.</p>
+
+    <h2 id="art-9"><span class="num">Art. IX</span>Constitutional Amendments</h2>
+    <p>Amendments to this constitution may be proposed by either the President, VPE, or VPO. Once proposed, the amendment must be discussed and voted upon by the executive team. A two-thirds (2/3) majority of the executives are required for the amendment to be adopted and incorporated into the constitution.</p>
+
+    <h2 id="art-10"><span class="num">Art. X</span>Succession</h2>
+    <h3 id="art-10-graduating">During the President, VPO or VPE’s graduating semester</h3>
+    <p>Application is created and sent to all VT CRO members allowing them to apply to fill the top 3 executive positions:</p>
+    <ul>
+      <li>President</li>
+      <li>VP of Operations (VPO)</li>
+      <li>VP of Engineering (VPE)</li>
+    </ul>
+    <p>Everyone who applies must be granted an interview with the current officer of whichever positions they applied to. If someone applies to multiple positions, they must be interviewed for each position they apply for by the respective officer.</p>
+    <p>President, VPO, and VPE convene.</p>
+    <p>The three will discuss which three candidates will succeed them. Once a list of 3 candidates is proposed and at least 2 of the 3 top executives confirm it, the outcome becomes official.</p>
+    <p>Outcomes are advertised by the next day. Replacements will be trained until the last day of classes, when the transition becomes official.</p>
+    <p>Each Support VP and Treasurer (VP of Outreach, VP of Learning) proposes a successor, which will be confirmed by at least 2 of the 3 top executives, one of which must be the President. New Support VP is trained by current Support VP.</p>
+    <h3 id="art-10-chief-engineers">After Competitions, Before End of Semester</h3>
+    <p>Each Chief Engineer nominates a successor sometime after their competition or end of their design cycle and before the end of the semester, which will be confirmed by at least 2 of the 3 top executives, one of which must be the President. New Chief Engineers are trained by current Chief Engineers. Chief engineers must nominate a successor after their tenure of one full design cycle.</p>
+
+    <h2 id="art-11"><span class="num">Art. XI</span>Member Onboarding/Offboarding</h2>
+    <h3 id="art-11-onboarding">Onboarding Process</h3>
+    <ol>
+      <li>Member must be notified and must formally accept an offer before being onboarded.</li>
+      <li>Member will be assigned to a team by appropriate executive.</li>
+      <li>Ensure if the member has a graduate standing, it doesn’t have possible rule conflicts in competitions.</li>
+      <li>Added to any communication platform used.</li>
+      <li>Added to any file-sharing platform.</li>
+      <li>Inform VP of Operations to add to membership database.</li>
+      <li>Given Lab Access (<a href="#lab-access">lab access form</a>)</li>
+      <li>Added to website.</li>
+      <li>Assigned a mentor.</li>
+    </ol>
+    <h3 id="art-11-offboarding">Offboarding Process</h3>
+    <ol>
+      <li>Members formally notified via email of being Offboarded.</li>
+      <li>Removed from communication platform.</li>
+      <li>Removed from any file-sharing platform.</li>
+      <li>Removed from website.</li>
+      <li>Inform VP of Operations to remove from membership database.</li>
+      <li>Lab access revoked.</li>
+    </ol>
+
+    <h2 id="art-12"><span class="num">Art. XII</span>Team Transfers</h2>
+    <p>If a member would like to transfer teams, they may be transferred as long as the executive of their desired team agrees, or the request is approved by the President. Then, all executives involved must be notified by the executive of the new team and old team.</p>
+
+    <h2 id="art-13"><span class="num">Art. XIII</span>Mentors</h2>
+    <p>When a new member is added to VT CRO, they shall be assigned a mentor to meet 1-on-1 with the new person within their own team to get them up to speed in the organization on both a social and engineering level. For senior design teams, this will not be necessary.</p>
+    <p>This mentor role should be done ideally on a volunteer basis; however, mentors can be appointed directly by the executive of the team.</p>
+
+    <h2 id="art-14"><span class="num">Art. XIV</span>Finance and Budgeting</h2>
+    <p>The financial structure of VT CRO will work as follows:</p>
+    <ol>
+      <li>At the beginning of the year, only essential purchases will be made while teams develop their ideas.</li>
+      <li>Around mid-September, exact date as decided by the President, each design and support team will submit a budget request, listing the items they need and the total cost. This will not include travel.</li>
+      <li>Budgets will then be allocated to each team based on their requests.</li>
+      <li>Executives will be given information on how to make purchases (see <a href="#purchasing">Purchasing</a>); purchases will largely be made through either –
+        <ol type="a">
+          <li>Department Purchase</li>
+          <li>CRO Debit Card</li>
+          <li>Personal Card, to be reimbursed</li>
+        </ol>
+        These methods of purchasing are listed in order of priority.
+      </li>
+      <li>As the year continues, budgets will expand to account for purchases and travel expenses. This will be overseen by the VP of Operations.</li>
+    </ol>
+    <p>The treasurer will be involved in all financial decisions and matters of VT CRO.</p>
+
+    <h2 id="art-15"><span class="num">Art. XV</span>General Recruitment</h2>
+    <p>While most executives have the authority to appoint members within their teams, the selection and recruitment process can be challenging. To ensure a steady flow of talent into VT CRO, a general recruitment will be held each fall, following this procedure (unless directed otherwise by the President):</p>
+    <ul>
+      <li>VT CRO will participate in O-Show and GobblerFest.</li>
+      <li>All Chief Engineers and VPs of support teams are responsible for drafting a preliminary recruitment breakdown. This should outline the total desired headcount and provide a specific distribution across disciplines.</li>
+      <li>Applications will close early in fall to allow for recruitment to finish before design teams progress too far in the design cycle.</li>
+      <li>VT CRO will host an interest meeting and speak at relevant classes to drive application interest.</li>
+      <li>The executive committee comprised of any interested executive will review submitted resumes and select candidates for interviews. At least 2 people should independently review each resume.</li>
+      <li>Interviews will be conducted to assess the suitability of the candidates.</li>
+      <li>Decisions will be made on which candidates to extend offers to, as well as determining their team placements.</li>
+      <li>After all offers have been accepted or declined, rejection emails will be sent to those not selected, informing them of the outcome.</li>
+      <li>After general recruitment is over, members may still be recruited and onboarded by individual executives on an ad-hoc basis, but no general applications will be open for all of VT CRO.</li>
+    </ul>
+
+    <h2 id="art-16"><span class="num">Art. XVI</span>Sponsors</h2>
+    <p>The President shall be mainly responsible for fundraising from corporations. Companies may be granted certain benefits depending on how much they contribute towards the organization.</p>
+
+    <h2 id="art-17"><span class="num">Art. XVII</span>Advisory Board</h2>
+    <p>A VT CRO Advisory Board comprised of faculty and industry people may be formed. It will schedule meetings to discuss strategy to improve the organization and may recommend actions to the executives of VT CRO.</p>
+
+    <h2 id="art-18"><span class="num">Art. XVIII</span>Ratification</h2>
+    <p>This document shall be ratified 2/3rds majority of all executives per the current constitution. This new constitution will become the official constitution of the club effective immediately on being ratified.</p>
+
+    <h2 id="signatories"><span class="num">Signed</span>Signatories</h2>
+    <ul class="signers">
+      <li>Aaditya Sharma<span>President</span></li>
+      <li>Ayra Nirar<span>VP of Operations</span></li>
+      <li>Casey Grothoff<span>VP of Engineering</span></li>
+      <li>Anannya Karthik<span>Treasurer</span></li>
+      <li>Frank Baxley<span>VP of Outreach</span></li>
+      <li>Connor Green<span>VP of Learning</span></li>
+      <li>Manan Sharma<span>Chief Engineer of AutoNav</span></li>
+      <li>Nick Cowen<span>Chief Engineer of CroDart</span></li>
+      <li>Bhavya Dosi<span>Chief Engineer of CroLabs</span></li>
+      <li>Emran Saidi<span>Chief Engineer of CroQuest</span></li>
+      <li>Joshua Smith<span>Chief Engineer of SoutheastCon</span></li>
+      <li>Emmett Blake<span>Chief Engineer of VexU</span></li>
+      <li>Lucas Wood<span>Chief Engineer of WorkCell</span></li>
+    </ul>
+    <details class="sig">
+      <summary>View the signed signature page</summary>
+      <img src="assets/constitution-signatures.png" alt="Signature page of the 2026 VT CRO constitution with all 13 executive signatures" loading="lazy">
+    </details>
+    <p style="margin-top:24px"><a class="back-top" href="#constitution-top">↑ Back to the table of contents</a></p>
+  </div>
+</section>
+
+  </main>
+</div>
+
+<script>
+/* ===================================================================
+   LINKS · every external URL lives here. Buttons use data-link="key".
+   =================================================================== */
+const LINKS = {
+  // NOTE: this is the form's design/edit URL from the exec info doc.
+  // Swap in the "share / collect responses" URL so execs can fill it out.
+  purchaseLog:   "https://forms.cloud.microsoft/Pages/DesignPageV2.aspx?origin=NeoPortalPage&subpage=design&id=hGiVYK0Q-kCGPU8yweOjepwav8eCYj5IqWDghSmXCDNURTYxQlpFVVQ3WFFTWFNKVDBOWUxXTFhQNi4u",
+  labAccessForm: "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=hGiVYK0Q-kCGPU8yweOjepwav8eCYj5IqWDghSmXCDNUOUFEVDc1QlBFQzU5NDJQOEdGWU5YMExETS4u",
+  labAccessSheet:"https://virginiatech-my.sharepoint.com/:x:/g/personal/aaditya07_vt_edu/IQCab1jLjHtSSrND1VZ9YBQZAeseVG1DGESiH3aHUMGzvY8?e=XAjFLN",
+  ecePortal:     "https://internal.ece.vt.edu/MIF/index.php/purchasing",
+  iseForm:       "https://docs.google.com/forms/d/e/1FAIpQLSfNbWpERpqG6a5aqvHI6pmn9Nq1ppcUy0UtFfE_fn3-ZVWSjA/viewform",
+};
+
+/* Teams for the purchase order note. Add or rename teams here. */
+const TEAMS = {
+  "Design teams":  ["AutoNav", "CroDart", "CroLabs", "CroQuest", "SoutheastCon", "VexU", "WorkCell"],
+  "Support teams": ["Learning", "Outreach", "Operations"],
+};
+const PO_PREFIX = "VT CRO Purchase Order - Team ";
+
+const store = {
+  get(k) { try { return localStorage.getItem("hub:" + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem("hub:" + k, v); } catch {} },
+};
+
+/* ---------- links ---------- */
+const extIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>';
+document.querySelectorAll("[data-link]").forEach(a => {
+  const url = LINKS[a.dataset.link];
+  if (!url) { a.classList.add("missing"); a.title = "Link not set"; return; }
+  a.href = url; a.target = "_blank"; a.rel = "noopener";
+  if (a.classList.contains("btn")) a.insertAdjacentHTML("beforeend", extIcon);
+});
+
+/* ---------- nav (built from the sections) ---------- */
+const pages = [...document.querySelectorAll("section.page")];
+const nav = document.getElementById("nav");
+const groups = {};
+pages.forEach(p => {
+  const g = p.dataset.group || "Other";
+  if (!groups[g]) {
+    const wrap = document.createElement("div");
+    wrap.className = "nav-group";
+    wrap.innerHTML = `<h6>${g}</h6>`;
+    nav.appendChild(wrap);
+    groups[g] = wrap;
+  }
+  const a = document.createElement("a");
+  a.href = "#" + p.id;
+  a.textContent = p.dataset.title || p.id;
+  a.dataset.page = p.id;
+  groups[g].appendChild(a);
+});
+
+/* ---------- tabs ---------- */
+function selectTab(tabsEl, key) {
+  const name = tabsEl.dataset.tabs;
+  tabsEl.querySelectorAll("[data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === key));
+  tabsEl.parentElement.querySelectorAll("[data-tab-panel]").forEach(p => p.classList.toggle("shown", p.dataset.tabPanel === key));
+  store.set("tab:" + name, key);
+}
+document.querySelectorAll("[data-tabs]").forEach(t => {
+  const first = t.querySelector("[data-tab]").dataset.tab;
+  const saved = store.get("tab:" + t.dataset.tabs);
+  selectTab(t, t.querySelector(`[data-tab="${saved}"]`) ? saved : first);
+  t.addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) selectTab(t, b.dataset.tab); });
+});
+
+/* ---------- routing: #page or #anchor-inside-a-page ---------- */
+function route(flash) {
+  const id = decodeURIComponent(location.hash.slice(1)) || "home";
+  const target = document.getElementById(id);
+  const page = target ? (target.matches("section.page") ? target : target.closest("section.page")) : null;
+  const active = page || pages[0];
+  pages.forEach(p => p.classList.toggle("active", p === active));
+  nav.querySelectorAll("a").forEach(a => a.removeAttribute("aria-current"));
+  nav.querySelector(`a[data-page="${active.id}"]`)?.setAttribute("aria-current", "page");
+  document.title = (active.id === "home" ? "" : (active.dataset.title + " · ")) + "VT CRO Exec Hub";
+  if (target && target !== active) reveal(target, flash);
+  else window.scrollTo(0, 0);
+}
+function reveal(el, flash) {
+  const panel = el.closest("[data-tab-panel]");
+  if (panel) {
+    const tabs = panel.parentElement.querySelector("[data-tabs]");
+    if (tabs) selectTab(tabs, panel.dataset.tabPanel);
+  }
+  requestAnimationFrame(() => {
+    el.scrollIntoView({ block: "start" });
+    if (flash) { el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
+  });
+}
+window.addEventListener("hashchange", () => route(true));
+route(false);
+
+/* ---------- team picker + purchase order note ---------- */
+const teamSel = document.getElementById("team");
+const teamOther = document.getElementById("team-other");
+teamSel.innerHTML = '<option value="">Choose your team…</option>' +
+  Object.entries(TEAMS).map(([g, list]) => `<optgroup label="${g}">${list.map(t => `<option>${t}</option>`).join("")}</optgroup>`).join("") +
+  '<option value="__other">Other…</option>';
+function currentTeam() {
+  if (teamSel.value === "__other") return teamOther.value.trim();
+  return teamSel.value;
+}
+function renderPO() {
+  const team = currentTeam();
+  const text = PO_PREFIX + (team || "_______");
+  document.querySelectorAll("[data-copy-po]").forEach(b => { b.textContent = text; b.dataset.copy = text; });
+  const subject = encodeURIComponent(PO_PREFIX + (team || ""));
+  document.getElementById("me-mailto").href = "mailto:amangs1@vt.edu?subject=" + subject;
+}
+const savedTeam = store.get("team") || "";
+const savedOther = store.get("teamOther") || "";
+if ([...teamSel.options].some(o => o.value === savedTeam)) teamSel.value = savedTeam;
+teamOther.value = savedOther;
+teamOther.hidden = teamSel.value !== "__other";
+teamSel.addEventListener("change", () => {
+  teamOther.hidden = teamSel.value !== "__other";
+  if (!teamOther.hidden) teamOther.focus();
+  store.set("team", teamSel.value); renderPO();
+});
+teamOther.addEventListener("input", () => { store.set("teamOther", teamOther.value); renderPO(); });
+renderPO();
+
+/* ---------- copy buttons ---------- */
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-copy]");
+  if (!b || b.matches("a")) return;
+  const text = b.dataset.copy;
+  try { await navigator.clipboard.writeText(text); }
+  catch {
+    const r = document.createRange(); r.selectNodeContents(b);
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    return;
+  }
+  b.classList.add("copied");
+  const label = b.dataset.copyLabel;
+  if (label) b.firstChild.textContent = "Copied";
+  clearTimeout(b._t);
+  b._t = setTimeout(() => { b.classList.remove("copied"); if (label) b.firstChild.textContent = label; }, 1400);
+});
+
+/* ---------- step checkmarks (per visit) ---------- */
+document.addEventListener("click", e => {
+  const n = e.target.closest(".step-num");
+  if (!n) return;
+  const step = n.closest(".step");
+  step.classList.toggle("done");
+  n.setAttribute("aria-label", step.classList.contains("done") ? "Mark step not done" : "Mark step done");
+});
+document.getElementById("reset-steps").addEventListener("click", () =>
+  document.querySelectorAll(".step.done").forEach(s => s.classList.remove("done")));
+
+/* ---------- search ---------- */
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+pages.forEach(p => p.querySelectorAll("h2, h3, h4").forEach(h => { if (!h.id) h.id = p.id + "-" + slug(h.textContent).slice(0, 48); }));
+const index = [];
+pages.forEach(p => {
+  p.querySelectorAll("h1, h2, h3, h4, p, li, td, th, summary").forEach(el => {
+    if (el.querySelector("p, li, ul, ol")) return; // keep the most specific element
+    const text = el.textContent.replace(/\s+/g, " ").trim();
+    if (text.length < 2) return;
+    // nearest heading above (for context + jump target)
+    let head = null, walker = el;
+    const all = [...p.querySelectorAll("h1, h2, h3, h4")];
+    for (const h of all) { if (h === el || (h.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING)) head = h; else break; }
+    index.push({ el, text, page: p, head: head || p });
+  });
+});
+const input = document.getElementById("search");
+const results = document.getElementById("results");
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let hits = [], activeHit = -1;
+function snippet(text, q) {
+  const i = text.toLowerCase().indexOf(q);
+  const start = Math.max(0, i - 40);
+  let s = (start > 0 ? "…" : "") + text.slice(start, i + q.length + 70) + (i + q.length + 70 < text.length ? "…" : "");
+  const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "ig");
+  return esc(s).replace(re, m => `<mark>${m}</mark>`);
+}
+function search() {
+  const q = input.value.trim().toLowerCase();
+  if (q.length < 2) { results.hidden = true; return; }
+  const seen = new Set();
+  hits = index.filter(r => r.text.toLowerCase().includes(q)).filter(r => !seen.has(r.el) && seen.add(r.el)).slice(0, 12);
+  activeHit = hits.length ? 0 : -1;
+  results.innerHTML = hits.length
+    ? hits.map((h, i) => {
+        const where = h.page.dataset.title + (h.head !== h.page && h.head.tagName !== "H1" ? " · " + h.head.textContent.replace(/^Art\. [IVX]+/, "").trim() : "");
+        return `<button data-i="${i}" class="${i === 0 ? "active" : ""}"><span class="r-where">${esc(where)}</span><span class="r-text">${snippet(h.text, q)}</span></button>`;
+      }).join("")
+    : `<div class="r-empty">No matches for “${esc(input.value.trim())}”</div>`;
+  results.hidden = false;
+}
+function go(i) {
+  const h = hits[i]; if (!h) return;
+  results.hidden = true; input.blur();
+  const page = h.page;
+  pages.forEach(p => p.classList.toggle("active", p === page));
+  history.replaceState(null, "", "#" + (h.head.id || page.id));
+  route(false);
+  reveal(h.el, true);
+}
+input.addEventListener("input", search);
+input.addEventListener("focus", search);
+input.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    if (!hits.length) return;
+    activeHit = (activeHit + (e.key === "ArrowDown" ? 1 : -1) + hits.length) % hits.length;
+    results.querySelectorAll("button").forEach((b, i) => b.classList.toggle("active", i === activeHit));
+  } else if (e.key === "Enter") { e.preventDefault(); go(activeHit); }
+  else if (e.key === "Escape") { results.hidden = true; input.blur(); }
+});
+results.addEventListener("mousedown", e => { const b = e.target.closest("button"); if (b) { e.preventDefault(); go(+b.dataset.i); } });
+document.addEventListener("click", e => { if (!e.target.closest(".search")) results.hidden = true; });
+document.addEventListener("keydown", e => {
+  if (e.key === "/" && !e.target.closest("input, textarea, select")) { e.preventDefault(); input.focus(); input.select(); }
+});
+</script>
+</body>
+</html>
