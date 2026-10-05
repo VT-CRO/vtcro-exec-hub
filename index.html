@@ -24,6 +24,7 @@
        .callout / .callout.warn  highlighted notes
        .tabs + [data-tab-panel]  segmented tabs inside a page
        .ref                    label / value reference table
+       .embed > iframe         embedded page (e.g. Google Calendar)
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -286,6 +287,10 @@ p { margin: 0 0 12px; max-width: 68ch; }
 .ref th { font-weight: 500; color: var(--text-2); width: 42%; }
 .ref td .muted { font-size: 13px; display: block; margin-top: 2px; }
 .ref thead th { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); background: var(--surface-2); }
+
+/* embeds (calendars, etc.) */
+.embed { margin-top: 20px; border: 1px solid var(--line); border-radius: var(--r-m); overflow: hidden; background: #fff; }
+.embed iframe { display: block; width: 100%; height: min(680px, 75vh); min-height: 420px; border: 0; }
 
 /* constitution */
 .toc { columns: 2 240px; column-gap: 24px; padding: 16px 18px; margin: 20px 0 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); list-style: none; }
@@ -570,6 +575,69 @@ hr.sep { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
   </ol>
 
   <p class="small muted">Full onboarding and offboarding checklists are in <a href="#art-11">Article XI of the constitution</a>.</p>
+</section>
+
+<!-- ================================================================== -->
+<!-- ROOM BOOKING                                                         -->
+<!-- ================================================================== -->
+<section class="page" id="room-booking" data-title="Book a room" data-group="Scheduling">
+  <p class="eyebrow">Scheduling</p>
+  <h1>Booking a room</h1>
+  <p class="lead">Reserve a general assignment classroom through Virginia Tech's EMS booking site.</p>
+
+  <h2 id="room-steps">Steps</h2>
+  <ol class="steps">
+    <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+      <h4>Open the EMS booking site</h4>
+      <div class="actions"><a class="btn primary" data-link="emsBooking">Open EMS room booking</a></div>
+    </div></li>
+    <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+      <h4>Start a classroom request</h4>
+      <p>Select <b>Book Now</b>, then <b>"Request General Assignment Classrooms"</b>.</p>
+    </div></li>
+    <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+      <h4>Search for a room</h4>
+      <p>Enter the date and time, then search.</p>
+    </div></li>
+    <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+      <h4>Pick a room and add it to your cart</h4>
+      <p>Every room that's available for that slot has a green <b>+</b> button. Click it on the room you want.</p>
+    </div></li>
+    <li class="step"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+      <h4>Fill out Reservation Details</h4>
+      <ul>
+        <li>Event type: <b>Meeting</b></li>
+        <li>Authorized contact: the <b>President</b> or any <b>Vice President</b></li>
+        <li>Second authorized contact: leave it blank</li>
+      </ul>
+    </div></li>
+    <li class="step final"><button class="step-num" aria-label="Mark step done"></button><div class="step-body">
+      <h4>Fill out the rest of the form and click Create Reservation</h4>
+    </div></li>
+  </ol>
+</section>
+
+<!-- ================================================================== -->
+<!-- LAB CALENDAR                                                         -->
+<!-- ================================================================== -->
+<section class="page" id="lab-calendar" data-title="Lab calendar" data-group="Scheduling">
+  <p class="eyebrow">Scheduling</p>
+  <h1>Lab calendar</h1>
+  <p class="lead">One shared calendar for all VT CRO lab spaces.</p>
+
+  <div class="callout strong" style="margin-top:24px" id="calendar-rule">
+    <h4>Every team and subteam meeting goes on this calendar</h4>
+    <p>No exceptions. When every meeting is on here, everyone can see when the lab is free and schedule around each other.</p>
+  </div>
+
+  <div class="embed">
+    <iframe title="VT CRO lab calendar" src="https://calendar.google.com/calendar/embed?src=c2101d7ed1b6c593bbf5c906919b3dd8e907228fa4b94d07089c2e8f4f4874d6%40group.calendar.google.com&amp;ctz=America%2FNew_York" loading="lazy"></iframe>
+  </div>
+  <div class="actions">
+    <a class="btn primary" data-link="labCalendarAdd">Add to my Google Calendar</a>
+    <a class="btn" data-link="labCalendar">Open full calendar</a>
+  </div>
+  <p class="small muted" style="margin-top:8px">Add the calendar to your own Google Calendar to create events on it. If the calendar above asks you to sign in, sign in with the Google account the calendar is shared with.</p>
 </section>
 
 <!-- ================================================================== -->
@@ -912,6 +980,9 @@ const LINKS = {
   labAccessSheet:"https://virginiatech-my.sharepoint.com/:x:/g/personal/aaditya07_vt_edu/IQCab1jLjHtSSrND1VZ9YBQZAeseVG1DGESiH3aHUMGzvY8?e=XAjFLN",
   ecePortal:     "https://internal.ece.vt.edu/MIF/index.php/purchasing",
   iseForm:       "https://docs.google.com/forms/d/e/1FAIpQLSfNbWpERpqG6a5aqvHI6pmn9Nq1ppcUy0UtFfE_fn3-ZVWSjA/viewform",
+  emsBooking:    "https://virginiatech.emscloudservice.com/web/Default.aspx",
+  labCalendar:   "https://calendar.google.com/calendar/embed?src=c2101d7ed1b6c593bbf5c906919b3dd8e907228fa4b94d07089c2e8f4f4874d6%40group.calendar.google.com&ctz=America%2FNew_York",
+  labCalendarAdd:"https://calendar.google.com/calendar/u/0?cid=YzIxMDFkN2VkMWI2YzU5M2JiZjVjOTA2OTE5YjNkZDhlOTA3MjI4ZmE0Yjk0ZDA3MDg5YzJlOGY0ZjQ4NzRkNkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t",
 };
 
 /* Teams for the purchase order note. Add or rename teams here. */
