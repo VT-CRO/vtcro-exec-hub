@@ -4,9 +4,9 @@ Internal reference site for VT CRO executives: purchasing steps, lab access, qui
 
 It's a static site (`index.html` + `assets/`) with no build step.
 
-## Hosting (Vercel)
+## Hosting (GitHub Pages)
 
-Import this repo in Vercel with the framework preset set to **Other**, and leave the build command and output directory empty. Every push to `main` redeploys.
+Served by GitHub Pages from the `main` branch root (Settings → Pages). There is no build step. Every push to `main` redeploys at https://vt-cro.github.io/vtcro-exec-hub/.
 
 The page has a `noindex` tag and `robots.txt` blocks crawlers, but the URL itself is not password protected.
 
