@@ -24,7 +24,7 @@
        .callout / .callout.warn  highlighted notes
        .tabs + [data-tab-panel]  segmented tabs inside a page
        .ref                    label / value reference table
-       .embed > iframe         embedded page (e.g. Google Calendar)
+       .embed > iframe         embedded calendar or other page
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -630,13 +630,13 @@ hr.sep { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
   </div>
 
   <div class="embed">
-    <iframe title="VT CRO lab calendar" src="https://calendar.google.com/calendar/embed?src=c2101d7ed1b6c593bbf5c906919b3dd8e907228fa4b94d07089c2e8f4f4874d6%40group.calendar.google.com&amp;ctz=America%2FNew_York" loading="lazy"></iframe>
+    <iframe title="VT CRO lab calendar" data-src-link="labCalendar" loading="lazy"></iframe>
   </div>
   <div class="actions">
-    <a class="btn primary" data-link="labCalendarAdd">Add to my Google Calendar</a>
+    <button class="btn primary" data-copy-link="labCalendarIcs" data-copy-label="Copy Outlook subscription link">Copy Outlook subscription link</button>
     <a class="btn" data-link="labCalendar">Open full calendar</a>
   </div>
-  <p class="small muted" style="margin-top:8px">Add the calendar to your own Google Calendar to create events on it. If the calendar above asks you to sign in, sign in with the Google account the calendar is shared with.</p>
+  <p class="small muted" style="margin-top:8px">To see updates in Outlook, copy the subscription link, then use Add calendar → Subscribe from web in Outlook. The published calendar is view-only; use the shared calendar in your VT account to create or edit events.</p>
 </section>
 
 <!-- ================================================================== -->
@@ -978,8 +978,8 @@ const LINKS = {
   ecePortal:     "https://internal.ece.vt.edu/MIF/index.php/purchasing",
   iseForm:       "https://docs.google.com/forms/d/e/1FAIpQLSfNbWpERpqG6a5aqvHI6pmn9Nq1ppcUy0UtFfE_fn3-ZVWSjA/viewform",
   emsBooking:    "https://virginiatech.emscloudservice.com/web/Default.aspx",
-  labCalendar:   "https://calendar.google.com/calendar/embed?src=c2101d7ed1b6c593bbf5c906919b3dd8e907228fa4b94d07089c2e8f4f4874d6%40group.calendar.google.com&ctz=America%2FNew_York",
-  labCalendarAdd:"https://calendar.google.com/calendar/u/0?cid=YzIxMDFkN2VkMWI2YzU5M2JiZjVjOTA2OTE5YjNkZDhlOTA3MjI4ZmE0Yjk0ZDA3MDg5YzJlOGY0ZjQ4NzRkNkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t",
+  labCalendar:   "https://outlook.office365.com/owa/calendar/4430bd0d9a2b44e5b0d8cd3c248326ab@vt.edu/dfdda4137f4d43458c085a6b82378bd111596713700962589447/calendar.html",
+  labCalendarIcs:"https://outlook.office365.com/owa/calendar/4430bd0d9a2b44e5b0d8cd3c248326ab@vt.edu/dfdda4137f4d43458c085a6b82378bd111596713700962589447/calendar.ics",
 };
 
 /* Teams for the purchase order note. Add or rename teams here. */
@@ -1002,6 +1002,8 @@ document.querySelectorAll("[data-link]").forEach(a => {
   a.href = url; a.target = "_blank"; a.rel = "noopener";
   if (a.classList.contains("btn")) a.insertAdjacentHTML("beforeend", extIcon);
 });
+document.querySelectorAll("[data-src-link]").forEach(frame => { frame.src = LINKS[frame.dataset.srcLink]; });
+document.querySelectorAll("[data-copy-link]").forEach(button => { button.dataset.copy = LINKS[button.dataset.copyLink]; });
 
 /* ---------- nav (built from the sections) ---------- */
 const pages = [...document.querySelectorAll("section.page")];
